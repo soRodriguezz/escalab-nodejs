@@ -58,7 +58,7 @@ const productSchema = new mongoose.Schema(
       type: String,
       enum: ["Apple", "Samsung", "Microsoft", "Lenovo", "ASUS"],
     },
-    rating: [
+    ratings: [
       {
         star: Number,
         postedBy: { type: ObjectId, ref: "User" },
@@ -70,9 +70,7 @@ const productSchema = new mongoose.Schema(
       enum: ["Active", "Inactive"],
     },
   },
-  {
-    timestamp: true,
-  }
+  { timestamps: true }
 );
 
 module.exports = mongoose.model("Product", productSchema);

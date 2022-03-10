@@ -2,10 +2,14 @@ const express = require("express");
 
 const router = express.Router();
 
-router.get("/user", (req, res) => {
-    res.json({
-        data: "Hello from user"
-    })
+// routes-endpoints - bad practice
+router.get("/user", (req, res, next) => {
+  res.json({
+    data: "hey you hit user API endpoint",
+  });
 });
+
+// good practice
+//router.post("/product", authCheck, adminCheck, validateCreateProduct, create);
 
 module.exports = router;

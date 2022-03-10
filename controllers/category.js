@@ -2,67 +2,62 @@ const Category = require("../models/category");
 const slugify = require("slugify");
 
 exports.create = async (req, res) => {
-  const { name } = req.body;
-  const category = new Category({ name, slug: slugify(name) });
   try {
-    await category.save();
-    res.status(201).json(category);
-  } catch (error) {
-    res.status(500).json({ message: "Error creating category", error });
+    const { name } = req.body;
+    //const category = await new Category({ name, slug: slugify(name) }).save();
+    //res.json(category);
+    res.json(await new Category({ name, slug: slugify(name) }).save());
+  } catch (err) {
+    console.log(err);
+    res.status(400).send("Create Category failed");
   }
 };
 
-exports.list = async (req, res) => {
+exports.list = async (req, res) =>
   res.json(
     await Category.find({ status: "Active" }).sort({ createdAt: -1 }).exec()
   );
-};
 
 exports.read = async (req, res) => {
-  let category = await Category.findOne({ 
+  let category = await Category.findOne({
     slug: req.params.slug,
     status: "Active",
   }).exec();
-
- res.json( category );
-
+  res.json(category);
 };
 
 exports.update = async (req, res) => {
-  const { name } = req.body;
-  try{
+  const { name, status } = req.body;
+  try {
     const updated = await Category.findOneAndUpdate(
       { slug: req.params.slug },
-      { name, slug: slugify(name) },
+      { name, slug: slugify(name), status },
       { new: true }
     ).exec();
     res.json(updated);
-  } catch(err) {
-    res.status(500).send("Error updating category");
+  } catch (err) {
+    res.status(400).send("Category update failed");
   }
 };
 
 exports.remove = async (req, res) => {
   try {
-    const deleted = await Category.findOneAndDelete(
-      { slug: req.params.slug }
-    ).exec();
+    const deleted = await Category.findOneAndDelete({ slug: req.params.slug });
     res.json(deleted);
   } catch (err) {
-    res.status(400).send("Error removing category");
+    res.status(400).send("Category delete failed");
   }
 };
 
-// soft-delete
 exports.removeSoft = async (req, res) => {
   try {
     const deleted = await Category.findOneAndUpdate(
       { slug: req.params.slug },
       { status: "Inactive" },
       { new: true }
-    ).exec();
+    );
     res.json(deleted);
   } catch (err) {
-    res.status(400).send("Error removing category");
+    res.status(400).send("Category delete failed");
   }
 };

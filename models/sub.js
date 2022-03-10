@@ -7,8 +7,8 @@ const subSchema = new mongoose.Schema(
       type: String,
       trim: true,
       required: "Name is required",
-      minlength: [2, "Name must be at least 2 characters long"],
-      maxlength: [32, "Name must be less than 32 characters long"],
+      minlength: [2, "Too short"],
+      maxlength: [32, "Too long"],
     },
     slug: {
       type: String,
@@ -16,20 +16,14 @@ const subSchema = new mongoose.Schema(
       lowercase: true,
       index: true,
     },
-    parent: {
-      type: ObjectId,
-      ref: "Category",
-      required: true,
-    },
+    parent: { type: ObjectId, ref: "Category", required: true },
     status: {
       type: String,
       default: "Active",
       enum: ["Active", "Inactive"],
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 module.exports = mongoose.model("Sub", subSchema);

@@ -19,10 +19,76 @@ exports.create = async (req, res) => {
 };
 
 exports.listAll = async (req, res) => {
-  const products = await Product.find({ status: "Active" })
+  let products = await Product.find({ status: "Active" })
     .limit(parseInt(req.params.count))
-    .sort([["createdAt", -1]])
+    .sort([["createdAt", "desc"]])
     .exec();
-
   res.json(products);
+};
+
+/*exports.productsCount = async (req, res) => {
+  let total = await Product.find({}).estimatedDocumentCount().exec();
+  res.json(total);
+};*/
+
+exports.removeSoft = async (req, res) => {
+  try {
+    const deleted = await Product.findOneAndUpdate(
+      {
+        slug: req.params.slug,
+      },
+      { status: "Inactive" },
+      { new: true }
+    ).exec();
+    res.json(deleted);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send("Product deleted failed");
+  }
+};
+
+exports.read = async (req, res) => {
+  const product = await Product.findOne({
+    slug: req.params.slug,
+    status: "Active",
+  }).exec();
+  res.json(product);
+};
+
+exports.update = async (req, res) => {
+  try {
+    if (req.body.title) {
+      req.body.slug = slugify(req.body.title);
+    }
+    const updated = await Product.findOneAndUpdate(
+      { slug: req.params.slug },
+      req.body,
+      { new: true }
+    ).exec();
+    res.json(updated);
+  } catch (err) {
+    console.log("PRODUCT UPDATE ERR ---->", err);
+    res.status(400).json({
+      err: err.message,
+    });
+  }
+};
+
+exports.list = async (req, res) => {
+  console.table(req.body);
+  try {
+    // createdAt/updatedAt, desc/asc, 3
+    const { sort, order, page } = req.body;
+    const currentPage = page | 1;
+    const perPage = 3;
+
+    const products = await Product.find({ status: "Active" })
+      .skip((currentPage - 1) * perPage)
+      .sort([[sort, order]])
+      .limit(perPage)
+      .exec();
+    res.json(products);
+  } catch (err) {
+    console.log(err);
+  }
 };
