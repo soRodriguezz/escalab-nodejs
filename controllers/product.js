@@ -26,10 +26,10 @@ exports.listAll = async (req, res) => {
   res.json(products);
 };
 
-/*exports.productsCount = async (req, res) => {
+exports.productsCount = async (req, res) => {
   let total = await Product.find({}).estimatedDocumentCount().exec();
   res.json(total);
-};*/
+};
 
 exports.removeSoft = async (req, res) => {
   try {
